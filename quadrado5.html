@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quadrado Mágico n × n</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="static/css/quadrado5.css">
+    <style>
+        body, .magic-card, .magic-grid, .magic-cell, .magic-row, input {
+            user-select: text !important;
+            -webkit-user-select: text !important;
+        }
+        .magic-cell input::-webkit-outer-spin-button,
+        .magic-cell input::-webkit-inner-spin-button {
+            -webkit-appearance: none; margin: 0;
+        }
+        .magic-cell input[type=number] {
+            -moz-appearance: textfield;
+        }
+        .soma-box {
+            margin: 10px 0 4px 0;
+            text-align: center;
+            font-size: 1.16em;
+            color: #175176;
+        }
+        .btn-mostrar-soma {
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-principal">
+        <div class="magic-card bg-white p-4 shadow">
+            <h1 class="titulo text-center mb-4">Quadrado Mágico n × n</h1>
+            <div class="settings-box mb-4">
+                <div class="row g-3 justify-content-center align-items-end mb-3">
+                    <div class="col-auto">
+                        <label for="n" class="form-label label-pequeno w-100 text-center mb-1">Ordem n:</label>
+                        <input type="number" id="n" value="3" min="3" class="form-control input-config text-center" style="width:90px;">
+                    </div>
+                    <div class="col-auto">
+                        <label for="start" class="form-label label-pequeno w-100 text-center mb-1">Número inicial:</label>
+                        <input type="number" id="start" value="1" class="form-control input-config text-center" style="width:90px;" min="1" max="99999">
+                    </div>
+                    <div class="col-auto">
+                        <label for="visiveis" class="form-label label-pequeno w-100 text-center mb-1">Números preenchidos:</label>
+                        <input type="number" id="visiveis" value="3" min="1" class="form-control input-config text-center mx-auto" style="width:90px;">
+                    </div>
+                </div>
+                <div class="row g-2 justify-content-center">
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-primary btn-novo" style="min-width:150px;" onclick="gerarDesafio()">Novo Desafio</button>
+                    </div>
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-outline-success btn-mostrar-soma" style="min-width:150px;" onclick="mostrarSomaMistica()">Mostrar Soma Mágica</button>
+                    </div>
+                </div>
+            </div>
+            <form id="desafio-form" onsubmit="corrigirDesafio(event)">
+                <div class="grid-wrapper">
+                    <div class="magic-grid mx-auto my-4" id="magic-grid-desafio"></div>
+                </div>
+            </form>
+            <div id="copy-box" class="text-center mb-2"></div>
+            <div class="soma-box" id="soma-total"></div>
+            <div id="feedback" class="mt-2 text-center"></div>
+            <div style="text-align: center; margin-top: 20px;">
+                <a href="index.html" class="btn btn-outline-secondary btn-voltar">&larr; Voltar ao Menu</a>
+            </div>
+        </div>
+    </div>
+<script src="static/js/magic.js"></script>
+<script>
+let respostaCorreta = [];
+let ordem = 3;
+let visiveis_atual = 3;
+let somaMistica = 0;
+let somaVisivel = false;
+
+function copyTexto(texto) {
+    const box = document.getElementById('copy-box');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(texto).then(() => {
+            box.innerHTML = "<small class='text-success'>Copiado!</small>";
+        }).catch(() => {
+            box.innerHTML = "<small class='text-danger'>Não foi possível copiar automaticamente.</small>";
+        });
+    } else {
+        box.innerHTML = "<small class='text-danger'>Seu navegador não permite cópia automática.</small>";
+    }
+}
+
+function limitarVisiveis() {
+    ordem = parseInt(document.getElementById('n').value, 10) || 3;
+    let visiveisInput = document.getElementById('visiveis');
+    visiveisInput.max = ordem * ordem;
+    if (parseInt(visiveisInput.value) > ordem * ordem) {
+        visiveisInput.value = ordem * ordem;
+    }
+    if (parseInt(visiveisInput.value) < 1) {
+        visiveisInput.value = 1;
+    }
+}
+
+document.getElementById('n').addEventListener('change', limitarVisiveis);
+document.getElementById('visiveis').addEventListener('input', limitarVisiveis);
+
+function gerarDesafio() {
+    document.getElementById('feedback').innerHTML = "";
+    document.getElementById('soma-total').innerHTML = "";
+    somaVisivel = false;
+    ordem = parseInt(document.getElementById('n').value, 10) || 3;
+    visiveis_atual = parseInt(document.getElementById('visiveis').value, 10) || 3;
+    const start = parseInt(document.getElementById('start').value, 10) || 1;
+
+    const data = gerarQuadrado5Desafio(ordem, start, visiveis_atual);
+    const quadrado = data.quadrado;
+    const visiveis = new Set(data.visiveis);
+    somaMistica = data.soma;
+    respostaCorreta = [].concat(...quadrado);
+
+    const grid = document.getElementById('magic-grid-desafio');
+    const wrapper = document.querySelector('.grid-wrapper');
+    const maxGridSize = Math.min(560, (wrapper?.clientWidth || 600) - 24);
+    const minCell = 18;
+    const cellSize = Math.max(minCell, Math.min(70, Math.floor(maxGridSize / ordem)));
+    grid.style.setProperty('--cell-size', `${cellSize}px`);
+    grid.style.gridTemplateColumns = `repeat(${ordem}, ${cellSize}px)`;
+    grid.style.gridTemplateRows = `repeat(${ordem}, ${cellSize}px)`;
+    
+    let html = '';
+    for (let i = 0; i < ordem; i++) {
+        for (let j = 0; j < ordem; j++) {
+            const idx = i * ordem + j;
+            if (visiveis.has(idx)) {
+                html += `<input type="text" value="${respostaCorreta[idx]}" readonly class="grid-cell cell-fixed">`;
+            } else {
+                html += `<input type="number" name="cel${idx}" min="1" step="1" class="grid-cell cell-input" oninput="if(this.value<1)this.value=1;">`;
+            }
+        }
+    }
+    grid.innerHTML = html;
+
+    const texto = quadrado.map(r => r.join('\t')).join('\n');
+    document.getElementById('copy-box').innerHTML = `
+        <button type="button" class="btn btn-outline-primary btn-sm btn-copiar" onclick='copyTexto(${JSON.stringify(texto)})'>Copiar quadrado</button>
+        <div class="mt-1"><small class="text-muted">Texto tabulado (${quadrado.length}x${quadrado.length}) pronto para colar</small></div>
+    `;
+}
+
+function mostrarSomaMistica() {
+    const el = document.getElementById('soma-total');
+    if (!somaVisivel) {
+        el.innerHTML = 'Soma mágica deste quadrado: <b>' + somaMistica + '</b>';
+    } else {
+        el.innerHTML = '';
+    }
+    somaVisivel = !somaVisivel;
+}
+
+function corrigirDesafio(e) {
+    e.preventDefault();
+    let ok = true;
+    for (let i = 0; i < ordem * ordem; i++) {
+        const input = document.querySelector(`input[name="cel${i}"]`);
+        if (input) {
+            const val = parseInt(input.value, 10);
+            if (val !== respostaCorreta[i]) {
+                ok = false;
+                input.classList.add('cell-errada');
+                input.classList.remove('cell-certa');
+            } else {
+                input.classList.add('cell-certa');
+                input.classList.remove('cell-errada');
+            }
+        }
+    }
+    document.getElementById('feedback').innerHTML = ok
+        ? "<span class='alert alert-success'>Parabéns, você completou corretamente!</span>"
+        : "<span class='alert alert-danger'>Ainda tem erros. Tente novamente!</span>";
+}
+
+window.onload = gerarDesafio;
+</script>
+</body>
+</html>

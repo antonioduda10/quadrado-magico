@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador Automático 3x3</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="static/css/quadrado1.css">
+</head>
+<body>
+<div class="container container-principal">
+    <div class="magic-card bg-white p-4 shadow">
+        <h1 class="titulo mb-4">Gerador Automático 3x3</h1>
+        <form class="d-flex flex-column flex-sm-row justify-content-center align-items-center gap-3 mb-4" onsubmit="event.preventDefault(); gerarQuadrado();">
+            <div class="d-flex flex-column align-items-center">
+                <label for="start" class="form-label label-pequeno mb-1 w-100 text-center">Número inicial:</label>
+                <input type="number" id="start" value="1" class="form-control text-center input-inicio" style="width:100px;" min="-999" max="999">
+            </div>
+            <button type="submit" class="btn btn-primary btn-gerar mt-2 mt-sm-4 align-self-sm-end align-self-center">✨ Gerar Quadrado</button>
+        </form>
+        <div id="magic-result" class="d-flex flex-column align-items-center"></div>
+        <div id="copy-box" class="text-center mt-2"></div>
+        <a href="index.html" class="btn btn-outline-secondary mt-4" style="max-width:210px;">&larr; Voltar ao Menu</a>
+    </div>
+</div>
+<script src="static/js/magic.js"></script>
+<script>
+    function copyTexto(texto) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(texto).then(() => {
+                document.getElementById('copy-box').innerHTML = "<small class='text-success'>Copiado!</small>";
+            }).catch(() => {
+                document.getElementById('copy-box').innerHTML = "<small class='text-danger'>Não foi possível copiar automaticamente.</small>";
+            });
+        } else {
+            document.getElementById('copy-box').innerHTML = "<small class='text-danger'>Seu navegador não permite cópia automática.</small>";
+        }
+    }
+
+    function gerarQuadrado() {
+        const startVal = parseInt(document.getElementById('start').value, 10);
+        const start = Number.isNaN(startVal) ? 1 : startVal;
+        const square = generateMagicSquareByStart(start);
+        const magic = square[0].reduce((a, b) => a + b, 0);
+
+        let table = `<table class="magic-table"><tbody>`;
+        for (const row of square) {
+            table += "<tr>";
+            for (const v of row) table += `<td class="magic-cell">${v}</td>`;
+            table += "</tr>";
+        }
+        table += "</tbody></table>";
+        table += `<div class="magic-sum alert alert-info mt-4">Soma mágica: <b>${magic}</b></div>`;
+        document.getElementById("magic-result").innerHTML = table;
+
+        const texto = square.map(r => r.join('\t')).join('\n');
+        document.getElementById('copy-box').innerHTML = `
+            <button type="button" class="btn btn-outline-primary btn-sm mt-3 btn-copiar" onclick='copyTexto(${JSON.stringify(texto)})'>📋 Copiar como texto</button>
+            <div class="mt-1"><small class="text-muted">Formato tabulado pronto para colar</small></div>
+        `;
+    }
+    window.onload = gerarQuadrado;
+</script>
+</body>
+</html>

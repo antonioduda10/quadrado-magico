@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete o Quadrado 3x3</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="static/css/quadrado2.css">
+</head>
+<body>
+    <div class="container d-flex flex-column align-items-center px-2">
+        <div class="settings-box text-center mb-3">
+            <h1 class="titulo text-center mb-4">Complete o Quadrado 3x3</h1>
+            <div class="row g-2 justify-content-center align-items-end mb-3">
+                <div class="col-12 col-sm-auto mb-2 mb-sm-0">
+                    <label for="start" class="form-label label-pequeno mb-1 w-100">Número inicial:</label>
+                    <input type="number" id="start" value="1" class="form-control text-center input-config">
+                </div>
+                <div class="col-12 col-sm-auto mb-2 mb-sm-0">
+                    <label for="visiveis" class="form-label label-pequeno mb-1 w-100">Números preenchidos:</label>
+                    <select id="visiveis" class="form-select text-center input-config">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3" selected>3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                    </select>
+                </div>
+            </div>
+            <button type="button" class="btn btn-primary btn-novo my-1 w-100" style="max-width:250px;" onclick="gerarDesafio()">Novo Desafio</button>
+            
+            <div id="magic-grid-desafio" class="mt-4"></div>
+            <div id="copy-box" class="text-center mt-3"></div>
+        </div>
+
+        <form id="desafio-form" class="w-100 d-flex flex-column align-items-center" onsubmit="corrigirDesafio(event)">
+            <button type="submit" class="btn btn-success mt-3 mb-3 w-100" style="max-width:210px;">Corrigir</button>
+        </form>
+
+        <div id="feedback" class="mt-2 text-center w-100"></div>
+        <a href="index.html" class="btn btn-outline-secondary mb-3 mx-auto" style="max-width:200px;">&larr; Voltar ao Menu</a>
+    </div>
+    <script>
+        let respostaCorreta = [];
+        let startAtual = 1;
+        let magicSum = 15;
+
+        function copyTexto(texto) {
+            const box = document.getElementById('copy-box');
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(texto).then(() => {
+                    box.innerHTML = "<small class='text-success'>Copiado!</small>";
+                }).catch(() => {
+                    box.innerHTML = "<small class='text-danger'>Não foi possível copiar automaticamente.</small>";
+                });
+            } else {
+                box.innerHTML = "<small class='text-danger'>Seu navegador não permite cópia automática.</small>";
+            }
+        }
+
+        function rotateRight(sq) {
+            return [
+                [sq[2][0], sq[1][0], sq[0][0]],
+                [sq[2][1], sq[1][1], sq[0][1]],
+                [sq[2][2], sq[1][2], sq[0][2]],
+            ];
+        }
+        function flipHorizontal(sq) {
+            return [sq[2], sq[1], sq[0]];
+        }
+        function flipVertical(sq) {
+            return sq.map(row => [row[2], row[1], row[0]]);
+        }
+        function allTransforms(sq) {
+            return [
+                sq,
+                rotateRight(sq),
+                rotateRight(rotateRight(sq)),
+                rotateRight(rotateRight(rotateRight(sq))),
+                flipHorizontal(sq),
+                flipVertical(sq),
+                rotateRight(flipHorizontal(sq)),
+                rotateRight(flipVertical(sq))
+            ];
+        }
+
+        function gerarQuadrado(start) {
+            const base = [
+                [8, 1, 6],
+                [3, 5, 7],
+                [4, 9, 2]
+            ];
+            const X = start - 1;
+            const offseted = base.map(row => row.map(cell => cell + X));
+            const variants = allTransforms(offseted);
+            return variants[Math.floor(Math.random() * variants.length)];
+        }
+
+        function gerarDesafio() {
+            document.getElementById('feedback').innerHTML = "";
+            startAtual = parseInt(document.getElementById('start').value, 10) || 1;
+
+            const quadrado = gerarQuadrado(startAtual);
+            respostaCorreta = quadrado.flat();
+
+            magicSum = quadrado[0].reduce((a, b) => a + b, 0);
+
+            const quantos = parseInt(document.getElementById('visiveis').value, 10);
+
+            const indices = Array.from({length: 9}, (_, i) => i);
+            indices.sort(() => Math.random() - 0.5);
+            const visiveis = new Set(indices.slice(0, quantos));
+
+            let html = '<div class="magic-grid">';
+            for (let i = 0; i < 9; i++) {
+                if (visiveis.has(i)) {
+                    html += `<div class="magic-cell"><input type="text" value="${respostaCorreta[i]}" readonly class="cell-fixed"></div>`;
+                } else {
+                    html += `<div class="magic-cell"><input type="number" name="cel${i}" required class="cell-input"></div>`;
+                }
+            }
+            html += '</div>';
+            document.getElementById('magic-grid-desafio').innerHTML = html;
+
+            const texto = quadrado.map(r => r.join('\t')).join('\n');
+            document.getElementById('copy-box').innerHTML = `
+                <button type="button" class="btn btn-outline-primary btn-sm btn-copiar" onclick='copyTexto(${JSON.stringify(texto)})'>Copiar solução</button>
+                <div class="mt-1"><small class="text-muted">Texto tabulado (3x3) pronto para colar</small></div>
+            `;
+        }
+
+        function corrigirDesafio(e) {
+            e.preventDefault();
+            let ok = true;
+            let user = [];
+            for (let i = 0; i < 9; i++) {
+                const input = document.querySelector(`input[name="cel${i}"]`);
+                if (input) {
+                    const val = parseInt(input.value, 10);
+                    user[i] = val;
+                    if (val !== respostaCorreta[i]) {
+                        ok = false;
+                        input.classList.add("cell-errada");
+                        input.classList.remove("cell-certa");
+                    } else {
+                        input.classList.add("cell-certa");
+                        input.classList.remove("cell-errada");
+                    }
+                } else {
+                    user[i] = respostaCorreta[i];
+                }
+            }
+            let isMagic = true;
+            for (let i = 0; i < 3; i++) {
+                let somaLinha = user[i*3] + user[i*3+1] + user[i*3+2];
+                let somaCol = user[i] + user[i+3] + user[i+6];
+                if (somaLinha !== magicSum || somaCol !== magicSum) isMagic = false;
+            }
+            let somaDiag1 = user[0] + user[4] + user[8];
+            let somaDiag2 = user[2] + user[4] + user[6];
+            if (somaDiag1 !== magicSum || somaDiag2 !== magicSum) isMagic = false;
+
+            document.getElementById('feedback').innerHTML = ok && isMagic
+                ? "<span class='alert alert-success px-4 py-2 d-inline-block rounded'>Parabéns, você completou corretamente!</span>"
+                : "<span class='alert alert-danger px-4 py-2 d-inline-block rounded'>Ainda tem erros. Tente novamente!</span>";
+        }
+
+        window.onload = gerarDesafio;
+    </script>
+</body>
+</html>
