@@ -1,0 +1,231 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container-principal {
+    width: 100%;
+    max-width: 1200px;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.magic-card {
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    border-radius: 24px;
+    background: #ffffff;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.3s ease;
+}
+
+.magic-card:hover {
+    transform: translateY(-5px);
+}
+
+.titulo {
+    text-align: center;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #667eea;
+    margin-bottom: 1.5rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.label-pequeno {
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: #555;
+}
+
+.input-inicio {
+    font-size: 1.2rem;
+    padding: 10px 15px;
+    border-radius: 10px;
+    text-align: center;
+    min-width: 100px;
+    border: 2px solid #667eea;
+    transition: all 0.3s ease;
+}
+
+.input-inicio:focus {
+    outline: none;
+    border-color: #764ba2;
+    box-shadow: 0 0 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-gerar {
+    font-size: 1.05rem;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    margin-top: 10px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    transition: all 0.3s ease;
+    color: white;
+    cursor: pointer;
+}
+
+.btn-gerar:hover, .btn-gerar:focus {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    transform: translateY(-2px);
+}
+
+.magic-table {
+    margin: 20px auto;
+    background: transparent;
+    border-radius: 15px;
+    border-collapse: separate;
+    border-spacing: 4px;
+    overflow: hidden;
+}
+
+.magic-cell {
+    font-size: 2rem;
+    font-weight: 600;
+    width: 75px;
+    height: 75px;
+    background: #d4e5f7;
+    color: #4a7bc4;
+    border: none;
+    border-radius: 8px;
+    text-align: center;
+    vertical-align: middle;
+    transition: all 0.3s ease;
+    padding: 0;
+}
+
+.magic-cell:hover {
+    background: #bdd4ed;
+    transform: scale(1.05);
+}
+
+
+
+.magic-sum {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #165e37;
+    background: #d4f4e8 !important;
+    border-radius: 8px;
+    margin: 20px auto 0 auto;
+    padding: 10px 24px;
+    box-shadow: none;
+    text-align: center;
+    display: inline-block;
+    border: none;
+}
+
+.btn-outline-secondary {
+    margin-top: 20px;
+    border-radius: 12px;
+    font-weight: 500;
+    width: 100%;
+    max-width: 250px;
+    padding: 10px 20px;
+    background: rgba(255,255,255,0.9);
+    transition: all 0.3s ease;
+}
+
+.btn-copiar {
+    border-radius: 8px;
+    padding: 8px 20px;
+    font-size: 0.95rem;
+}
+
+.btn-outline-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.magic-sum {
+    font-size: 1.13em;
+    font-weight: 600;
+    color: #165e37;
+    background: #d4f4e8 !important;
+    border-radius: 8px;
+    margin: 20px auto 0 auto;
+    padding: 10px 24px;
+    box-shadow: none;
+    text-align: center;
+}
+
+.btn-outline-secondary {
+    margin-top: 16px;
+    border-radius: 10px;
+    font-weight: 500;
+    width: 100%;
+    max-width: 210px;
+}
+
+/* Tablets */
+@media (max-width: 768px) {
+    .magic-card {
+        padding: 30px 25px;
+        max-width: 90%;
+    }
+    
+    .titulo {
+        font-size: 1.8rem;
+    }
+    
+    .magic-cell {
+        font-size: 1.8em;
+        width: 70px;
+        height: 70px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+    .container-principal {
+        padding: 15px;
+    }
+    
+    .magic-card {
+        padding: 25px 20px;
+    }
+    
+    .titulo {
+        font-size: 1.4rem;
+    }
+    
+    .magic-cell {
+        font-size: 1.4em;
+        width: 60px;
+        height: 60px;
+        border: 2px solid #90caf9;
+    }
+    
+    .input-inicio {
+        font-size: 1rem;
+        min-width: 80px;
+    }
+    
+    .btn-gerar {
+        font-size: 1rem;
+        padding: 10px 20px;
+    }
+    
+    .btn-outline-secondary {
+        font-size: 0.95rem;
+    }
+}

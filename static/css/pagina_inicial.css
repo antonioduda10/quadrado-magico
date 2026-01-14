@@ -1,0 +1,162 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container-principal {
+    width: 100%;
+    max-width: 1200px;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.main-card {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    border-radius: 24px;
+    background: #ffffff;
+    position: relative;
+    transition: transform 0.3s ease;
+    padding: 40px;
+}
+
+.main-card:hover {
+    transform: translateY(-5px);
+}
+
+.magic-image {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    display: block;
+    margin: 20px auto 30px auto;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    border: 3px solid #667eea;
+    object-fit: contain;
+}
+
+.menu-btn {
+    margin: 0;
+    width: 100%;
+    font-size: 1.1rem;
+    border-radius: 12px;
+    font-weight: 600;
+    padding: 15px;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.menu-btn:hover, .menu-btn:focus {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+h1 {
+    font-weight: 700;
+    color: #667eea;
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 15px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.descricao {
+    font-size: 1.1rem;
+    color: #555;
+    margin-bottom: 20px;
+    text-align: center;
+    line-height: 1.6;
+}
+
+.autor-dentro-card {
+    position: absolute;
+    right: 20px;
+    bottom: 15px;
+    font-size: 0.85rem;
+    color: #999;
+    opacity: 0.7;
+    font-style: italic;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* Tablets */
+@media (max-width: 768px) {
+    .main-card {
+        padding: 30px 25px;
+        max-width: 90%;
+    }
+    
+    h1 {
+        font-size: 2rem;
+    }
+    
+    .descricao {
+        font-size: 1rem;
+    }
+    
+    .menu-btn {
+        font-size: 1rem;
+        padding: 12px;
+    }
+    
+    .magic-image {
+        max-width: 100%;
+    }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+    .container-principal {
+        padding: 15px;
+    }
+    
+    .main-card {
+        padding: 25px 20px;
+        border-radius: 20px;
+    }
+    
+    h1 {
+        font-size: 1.6rem;
+    }
+    
+    .descricao {
+        font-size: 0.95rem;
+    }
+    
+    .menu-btn {
+        font-size: 0.95rem;
+        padding: 12px;
+    }
+    
+    .magic-image {
+        margin: 15px auto 20px auto;
+    }
+    
+    .autor-dentro-card {
+        font-size: 0.7rem;
+        right: 15px;
+        bottom: 10px;
+    }
+    
+    .d-grid {
+        gap: 12px !important;
+    }
+}

@@ -1,0 +1,236 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.titulo {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #667eea;
+    text-shadow: none;
+}
+
+.label-pequeno {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #555;
+}
+
+.settings-box {
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    padding: 35px;
+    margin: 20px auto;
+    max-width: 600px;
+}
+
+.input-config {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 8px 12px;
+}
+
+.magic-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 80px);
+    grid-template-rows: repeat(3, 80px);
+    gap: 2px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 3px solid #4ecdc4;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    background: #4ecdc4;
+    margin: 0 auto;
+    width: 246px;
+    height: 246px;
+    padding: 0;
+}
+
+.magic-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    width: 80px;
+    height: 80px;
+    aspect-ratio: 1/1;
+    border: none;
+}
+
+.magic-cell:nth-child(3n) { 
+    border-right: none; 
+}
+
+.magic-cell:nth-child(n+7) { 
+    border-bottom: none; 
+}
+
+.magic-cell input {
+    width: 100%;
+    height: 100%;
+    font-size: 1.7rem;
+    text-align: center;
+    border: none;
+    background: transparent;
+    font-weight: 600;
+    color: #4a7bc4;
+    transition: all 0.3s ease;
+    outline: none;
+    padding: 0;
+    margin: 0;
+    line-height: 80px;
+}
+
+.cell-fixed {
+    background: #d4f4e8 !important;
+    color: #4a7bc4;
+    font-weight: 600;
+}
+
+.cell-input {
+    background: #ffffff;
+}
+
+.cell-input:focus {
+    background: #f0f8ff;
+}
+
+.cell-certa {
+    background: #a5d6a7 !important;
+    color: #1b5e20;
+    animation: pulse 0.5s;
+}
+
+.cell-errada {
+    background: #ef9a9a !important;
+    color: #b71c1c;
+    animation: shake 0.5s;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.btn-novo {
+    font-size: 1.05rem;
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-weight: 600;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.btn-novo:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.btn-copiar {
+    border-radius: 8px;
+    padding: 8px 20px;
+    font-size: 0.95rem;
+}
+
+.btn-success {
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    background-color: #28a745;
+    border: none;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+}
+
+.btn-outline-secondary {
+    border-radius: 8px;
+    padding: 9px 20px;
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+/* Tablets */
+@media (max-width: 768px) {
+    .titulo {
+        font-size: 1.8rem;
+    }
+    
+    .magic-grid {
+        grid-template-columns: repeat(3, 70px);
+        grid-template-rows: repeat(3, 70px);
+        width: 216px;
+        height: 216px;
+        gap: 2px;
+        border: 3px solid #4ecdc4;
+    }
+    
+    .magic-cell input {
+        font-size: 1.6rem;
+    }
+    
+    .settings-box {
+        padding: 20px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+    body {
+        padding: 15px;
+    }
+    
+    .titulo {
+        font-size: 1.4rem;
+    }
+    
+    .magic-grid {
+        grid-template-columns: repeat(3, 60px);
+        grid-template-rows: repeat(3, 60px);
+        width: 186px;
+        height: 186px;
+        gap: 2px;
+        border: 3px solid #4ecdc4;
+    }
+    
+    .magic-cell input {
+        font-size: 1.3rem;
+    }
+    
+    .settings-box {
+        padding: 20px;
+    }
+    
+    .btn-novo, .btn-success {
+        font-size: 1rem;
+        padding: 10px 20px;
+    }
+}

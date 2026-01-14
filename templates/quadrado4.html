@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preencher Números Ocultos</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/quadrado4.css') }}">
+</head>
+<body>
+    <div class="container-principal">
+        <div class="magic-card bg-white p-4 shadow">
+            <h1 class="titulo text-center mb-4">Preencher Números Ocultos</h1>
+            <div class="settings-box mb-4">
+                <div class="row g-3 justify-content-center align-items-end mb-3">
+                    <div class="col-auto">
+                        <label for="start" class="form-label label-pequeno w-100 text-center mb-1">Número inicial:</label>
+                        <input type="number" id="start" value="1" class="form-control input-config text-center" style="width:100px;" min="-999" max="999">
+                    </div>
+                    <div class="col-auto">
+                        <label for="visiveis" class="form-label label-pequeno w-100 text-center mb-1">Números preenchidos:</label>
+                        <select id="visiveis" class="form-select input-config text-center" style="width:110px;">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3" selected>3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-primary btn-novo mx-auto d-block" style="max-width:220px;" onclick="gerarDesafio()">Novo Desafio</button>
+            </div>
+            <form id="desafio-form" onsubmit="corrigirDesafio(event)">
+                <div class="magic-grid mx-auto my-4" id="magic-grid-desafio"></div>
+                <div class="text-center mb-2">
+                    <button type="button" id="toggle-sum-btn" class="btn btn-outline-primary btn-sm btn-toggle-sum" onclick="toggleSoma()">Mostrar soma mágica</button>
+                </div>
+                <div id="magic-sum-box" class="text-center mb-2"></div>
+                <div id="copy-box" class="text-center mb-3"></div>
+                <div style="text-align: center;">
+                    <button type="submit" class="btn btn-success btn-corrigir" style="max-width:180px;">Corrigir</button>
+                </div>
+            </form>
+            <div id="feedback" class="mt-3 text-center"></div>
+            <div style="text-align: center; margin-top: 20px;">
+                <a href="{{ url_for('pagina_inicial') }}" class="btn btn-outline-secondary btn-voltar">&larr; Voltar ao Menu</a>
+            </div>
+        </div>
+    </div>
+<script>
+    // ----------- QUADRADO MÁGICO 3x3 EQUIVALENTES -----------
+    // Todas as 8 rotações/espelhamentos do quadrado padrão 3x3
+    function getAllTransforms(square) {
+        function rotate(sq) {
+            return [
+                [sq[2][0], sq[1][0], sq[0][0]],
+                [sq[2][1], sq[1][1], sq[0][1]],
+                [sq[2][2], sq[1][2], sq[0][2]]
+            ];
+        }
+        function flipH(sq) { return [sq[2], sq[1], sq[0]]; }
+        let transforms = [];
+        let sq = square;
+        for (let i = 0; i < 4; i++) {
+            transforms.push(sq);
+            transforms.push(flipH(sq));
+            sq = rotate(sq);
+        }
+        return transforms;
+    }
+
+    function gerarQuadrado(start) {
+        const base = [
+            [8, 1, 6],
+            [3, 5, 7],
+            [4, 9, 2]
+        ];
+        // Aplica offset
+        const X = start - 1;
+        const offset = base.map(row => row.map(cell => cell + X));
+        // Sorteia uma rotação/espelhamento a cada geração
+        const all = getAllTransforms(offset);
+        const sorteado = all[Math.floor(Math.random() * all.length)];
+        return sorteado;
+    }
+
+    // ----------- POSICIONAMENTO DOS NÚMEROS VISÍVEIS -----------
+    // Garante que, para 3 visíveis, não estejam todos na mesma linha ou coluna
+    function escolherIndicesVisiveis(quantos) {
+        let indices = Array.from({length: 9}, (_, i) => i);
+
+        if (quantos !== 3) {
+            // Em outros casos, embaralha e pega os primeiros 'quantos'
+            indices.sort(() => Math.random() - 0.5);
+            return indices.slice(0, quantos);
+        }
+        // Lista de trios possíveis que nunca estão todos na mesma linha ou coluna
+        const triosValidos = [
+            // exemplos típicos: um de cada linha e cada coluna
+            [0, 4, 8], [2, 4, 6], // diagonais
+            [0, 1, 3], [0, 2, 6], [0, 2, 4], [0, 4, 7], [0, 5, 7], [0, 5, 8], [0, 6, 8], [0, 3, 8], [0, 4, 6],
+            [1, 3, 8], [1, 4, 6], [1, 6, 8], [1, 2, 7], [1, 2, 4], [1, 4, 8], [1, 5, 6], [1, 5, 7],
+            [2, 3, 7], [2, 3, 8], [2, 4, 6], [2, 4, 7], [2, 5, 6], [2, 5, 7],
+            [3, 5, 7], [3, 5, 8], [3, 6, 8], [3, 7, 8], [4, 5, 6], [4, 5, 7], [4, 6, 8], [4, 7, 8],
+            [5, 6, 7], [5, 6, 8], [5, 7, 8], [6, 7, 8],
+        ].filter(trio => {
+            // Remove trios da mesma linha ou coluna
+            const rows = trio.map(i => Math.floor(i / 3));
+            const cols = trio.map(i => i % 3);
+            return !(rows[0] === rows[1] && rows[1] === rows[2]) &&
+                   !(cols[0] === cols[1] && cols[1] === cols[2]);
+        });
+
+        // Escolhe um trio válido aleatório
+        return triosValidos[Math.floor(Math.random() * triosValidos.length)];
+    }
+
+    // ----------- GERAÇÃO DO DESAFIO -----------
+    let respostaCorreta = [];
+    let startAtual = 1;
+    let quadradoAtual = [];
+    let magicSum = 0;
+    let showSoma = false;
+
+    function renderSoma() {
+        const box = document.getElementById('magic-sum-box');
+        const btn = document.getElementById('toggle-sum-btn');
+        if (btn) btn.innerText = showSoma ? 'Ocultar soma mágica' : 'Mostrar soma mágica';
+        if (!box) return;
+        if (showSoma) {
+            box.innerHTML = `<div class="magic-sum">Soma mágica: <strong>${magicSum}</strong></div>`;
+        } else {
+            box.innerHTML = '';
+        }
+    }
+
+    function toggleSoma() {
+        showSoma = !showSoma;
+        renderSoma();
+    }
+
+    function copyTexto(texto) {
+        const box = document.getElementById('copy-box');
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(texto).then(() => {
+                box.innerHTML = "<small class='text-success'>Copiado!</small>";
+            }).catch(() => {
+                box.innerHTML = "<small class='text-danger'>Não foi possível copiar automaticamente.</small>";
+            });
+        } else {
+            box.innerHTML = "<small class='text-danger'>Seu navegador não permite cópia automática.</small>";
+        }
+    }
+
+    function gerarDesafio() {
+        document.getElementById('feedback').innerHTML = "";
+        startAtual = parseInt(document.getElementById('start').value, 10) || 1;
+        quadradoAtual = gerarQuadrado(startAtual);
+        respostaCorreta = quadradoAtual.flat();
+        magicSum = quadradoAtual[0].reduce((a, b) => a + b, 0);
+        showSoma = false;
+        const quantos = parseInt(document.getElementById('visiveis').value, 10);
+        const indices = escolherIndicesVisiveis(quantos);
+        const visiveis = new Set(indices);
+        let html = '';
+        for (let i = 0; i < 3; i++) {
+            html += '<div class="magic-row">';
+            for (let j = 0; j < 3; j++) {
+                const idx = i * 3 + j;
+                if (visiveis.has(idx)) {
+                    html += `<div class="magic-cell"><input type="text" value="${respostaCorreta[idx]}" readonly class="cell-fixed"></div>`;
+                } else {
+                    html += `<div class="magic-cell"><input type="number" name="cel${idx}" required class="cell-input"></div>`;
+                }
+            }
+            html += '</div>';
+        }
+        document.getElementById('magic-grid-desafio').innerHTML = html;
+
+        const texto = quadradoAtual.map(r => r.join('\t')).join('\n');
+        document.getElementById('copy-box').innerHTML = `
+            <button type="button" class="btn btn-outline-primary btn-sm btn-copiar" onclick='copyTexto(${JSON.stringify(texto)})'>Copiar solução</button>
+            <div class="mt-1"><small class="text-muted">Texto tabulado (3x3) pronto para colar</small></div>
+        `;
+        renderSoma();
+    }
+
+    function corrigirDesafio(e) {
+        e.preventDefault();
+        let ok = true;
+        for (let i = 0; i < 9; i++) {
+            const input = document.querySelector(`input[name="cel${i}"]`);
+            if (input) {
+                if (parseInt(input.value, 10) !== respostaCorreta[i]) {
+                    ok = false;
+                    input.classList.add("cell-errada");
+                    input.classList.remove("cell-certa");
+                } else {
+                    input.classList.add("cell-certa");
+                    input.classList.remove("cell-errada");
+                }
+            }
+        }
+        document.getElementById('feedback').innerHTML = ok
+            ? "<span class='alert alert-success'>Parabéns, você completou corretamente!</span>"
+            : "<span class='alert alert-danger'>Ainda tem erros. Tente novamente!</span>";
+    }
+
+    window.onload = gerarDesafio;
+</script>
+</body>
+</html>
